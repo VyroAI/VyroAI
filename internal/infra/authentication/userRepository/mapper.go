@@ -27,3 +27,14 @@ func userEmailDbToModel(userDB sqlc.GetUserByEmailRow) *entites.User {
 		Status:     string(userDB.Status),
 	}
 }
+
+func userNameToDbToModel(userDB sqlc.GetUserByUsernameRow) *entites.User {
+	return &entites.User{
+		Id:         userDB.ID,
+		Username:   userDB.Username,
+		Email:      userDB.Email,
+		AvatarID:   userDB.AvatarID,
+		Permission: userDB.Permission,
+		Status:     string(userDB.Status),
+	}
+}

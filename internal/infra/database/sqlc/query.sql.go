@@ -19,6 +19,25 @@ func (q *Queries) AddEmailToNewsletter(ctx context.Context, email string) error 
 	return err
 }
 
+const createUser = `-- name: CreateUser :execlastid
+INSERT users (username, email, password)
+VALUES (?, ?, ?)
+`
+
+type CreateUserParams struct {
+	Username string
+	Email    string
+	Password string
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createUser, arg.Username, arg.Email, arg.Password)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id,
        username,
@@ -84,6 +103,43 @@ type GetUserByIDRow struct {
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserByID, id)
 	var i GetUserByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.AvatarID,
+		&i.Permission,
+		&i.EmailConfirmed,
+		&i.Status,
+	)
+	return i, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id,
+       username,
+       email,
+       avatar_id,
+       permission,
+       email_confirmed,
+       status
+FROM users
+WHERE username = ?
+`
+
+type GetUserByUsernameRow struct {
+	ID             int64
+	Username       string
+	Email          string
+	AvatarID       string
+	Permission     int32
+	EmailConfirmed bool
+	Status         UsersStatus
+}
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (GetUserByUsernameRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+	var i GetUserByUsernameRow
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
