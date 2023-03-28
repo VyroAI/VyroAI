@@ -1,0 +1,10 @@
+version: 2
+sql:
+  - schema: "internal/infra/database/schema.sql"
+    queries: "internal/infra/database/query.sql"
+    engine: "mysql"
+    gen:
+      go:
+        package: "sqlc"
+        out: "internal/infra/database/sqlc"
+
