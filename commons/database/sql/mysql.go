@@ -13,7 +13,7 @@ type sqlConfig struct {
 }
 
 func NewSqlConn() *sqlx.DB {
-	db, err := sqlx.Connect("mysql", os.Getenv("PLANETSCALE_DB_DEV"))
+	db, err := sqlx.Connect("mysql", os.Getenv("PLANETSCALE_DB"))
 	if err != nil {
 		panic(err)
 		return nil
@@ -24,7 +24,7 @@ func NewSqlConn() *sqlx.DB {
 	}
 
 	log.Println("Connected to sql DB")
-	
+
 	return db
 
 }

@@ -18,6 +18,7 @@ var (
 
 type Tracer interface {
 	NewTracer() trace.Tracer
+	InitFiberTrace() *sdktrace.TracerProvider
 }
 
 type tracer struct {
@@ -70,4 +71,5 @@ func (t *tracer) NewTraceProvider(exp *otlptrace.Exporter) *sdktrace.TracerProvi
 		sdktrace.WithBatcher(exp),
 		sdktrace.WithResource(resource),
 	)
+
 }

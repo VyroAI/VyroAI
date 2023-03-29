@@ -9,7 +9,7 @@ import (
 func TestTrace(t *testing.T) {
 	ctx := context.Background()
 
-	tracer := InitTracing()
+	tracer := InitTracing("testing", "0.1.0")
 
 	trace := tracer.NewTracer()
 
