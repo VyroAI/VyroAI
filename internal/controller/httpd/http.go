@@ -30,6 +30,7 @@ func (s *WebServiceHttpServer) Router() *fiber.App {
 			log.Printf("Error shutting down tracer provider: %v", err)
 		}
 	}()
+
 	app := fiber.New()
 	app.Use(cors.New())
 

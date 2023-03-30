@@ -7,6 +7,8 @@ package sqlc
 
 import (
 	"context"
+	"database/sql"
+	"time"
 )
 
 const addEmailToNewsletter = `-- name: AddEmailToNewsletter :exec
@@ -20,18 +22,37 @@ func (q *Queries) AddEmailToNewsletter(ctx context.Context, email string) error 
 }
 
 const createUser = `-- name: CreateUser :execlastid
-INSERT users (username, email, password)
-VALUES (?, ?, ?)
+INSERT users (username, email, password, subscription_id)
+VALUES (?, ?, ?, ?)
 `
 
 type CreateUserParams struct {
-	Username string
-	Email    string
-	Password string
+	Username       string
+	Email          string
+	Password       sql.NullString
+	SubscriptionID int64
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createUser, arg.Username, arg.Email, arg.Password)
+	result, err := q.db.ExecContext(ctx, createUser,
+		arg.Username,
+		arg.Email,
+		arg.Password,
+		arg.SubscriptionID,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
+const createUserSubscription = `-- name: CreateUserSubscription :execlastid
+INSERT user_subscriptions (api_key)
+VALUES (?)
+`
+
+func (q *Queries) CreateUserSubscription(ctx context.Context, apiKey string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createUserSubscription, apiKey)
 	if err != nil {
 		return 0, err
 	}
@@ -46,7 +67,8 @@ SELECT id,
        password,
        permission,
        email_confirmed,
-       status
+       is_banned,
+       created_at
 FROM users
 WHERE email = ?
 `
@@ -56,10 +78,11 @@ type GetUserByEmailRow struct {
 	Username       string
 	Email          string
 	AvatarID       string
-	Password       string
+	Password       sql.NullString
 	Permission     int32
 	EmailConfirmed bool
-	Status         UsersStatus
+	IsBanned       bool
+	CreatedAt      time.Time
 }
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
@@ -73,7 +96,8 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 		&i.Password,
 		&i.Permission,
 		&i.EmailConfirmed,
-		&i.Status,
+		&i.IsBanned,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -85,7 +109,8 @@ SELECT id,
        avatar_id,
        permission,
        email_confirmed,
-       status
+       is_banned,
+       created_at
 FROM users
 WHERE id = ?
 `
@@ -97,7 +122,8 @@ type GetUserByIDRow struct {
 	AvatarID       string
 	Permission     int32
 	EmailConfirmed bool
-	Status         UsersStatus
+	IsBanned       bool
+	CreatedAt      time.Time
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, error) {
@@ -110,7 +136,8 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, er
 		&i.AvatarID,
 		&i.Permission,
 		&i.EmailConfirmed,
-		&i.Status,
+		&i.IsBanned,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -122,7 +149,8 @@ SELECT id,
        avatar_id,
        permission,
        email_confirmed,
-       status
+       is_banned,
+       created_at
 FROM users
 WHERE username = ?
 `
@@ -134,7 +162,8 @@ type GetUserByUsernameRow struct {
 	AvatarID       string
 	Permission     int32
 	EmailConfirmed bool
-	Status         UsersStatus
+	IsBanned       bool
+	CreatedAt      time.Time
 }
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (GetUserByUsernameRow, error) {
@@ -147,7 +176,8 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (GetUs
 		&i.AvatarID,
 		&i.Permission,
 		&i.EmailConfirmed,
-		&i.Status,
+		&i.IsBanned,
+		&i.CreatedAt,
 	)
 	return i, err
 }

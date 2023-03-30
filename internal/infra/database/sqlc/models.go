@@ -11,95 +11,68 @@ import (
 	"time"
 )
 
-type SubscriptionPlansName string
+type OauthRegisterOauthProvider string
 
 const (
-	SubscriptionPlansNameFREE       SubscriptionPlansName = "FREE"
-	SubscriptionPlansNamePRO        SubscriptionPlansName = "PRO"
-	SubscriptionPlansNameENTERPRISE SubscriptionPlansName = "ENTERPRISE"
+	OauthRegisterOauthProviderAPPLE     OauthRegisterOauthProvider = "APPLE"
+	OauthRegisterOauthProviderGOOGLE    OauthRegisterOauthProvider = "GOOGLE"
+	OauthRegisterOauthProviderINSTAGRAM OauthRegisterOauthProvider = "INSTAGRAM"
+	OauthRegisterOauthProviderDISCORD   OauthRegisterOauthProvider = "DISCORD"
 )
 
-func (e *SubscriptionPlansName) Scan(src interface{}) error {
+func (e *OauthRegisterOauthProvider) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = SubscriptionPlansName(s)
+		*e = OauthRegisterOauthProvider(s)
 	case string:
-		*e = SubscriptionPlansName(s)
+		*e = OauthRegisterOauthProvider(s)
 	default:
-		return fmt.Errorf("unsupported scan type for SubscriptionPlansName: %T", src)
+		return fmt.Errorf("unsupported scan type for OauthRegisterOauthProvider: %T", src)
 	}
 	return nil
 }
 
-type NullSubscriptionPlansName struct {
-	SubscriptionPlansName SubscriptionPlansName
-	Valid                 bool // Valid is true if SubscriptionPlansName is not NULL
+type NullOauthRegisterOauthProvider struct {
+	OauthRegisterOauthProvider OauthRegisterOauthProvider
+	Valid                      bool // Valid is true if OauthRegisterOauthProvider is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullSubscriptionPlansName) Scan(value interface{}) error {
+func (ns *NullOauthRegisterOauthProvider) Scan(value interface{}) error {
 	if value == nil {
-		ns.SubscriptionPlansName, ns.Valid = "", false
+		ns.OauthRegisterOauthProvider, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.SubscriptionPlansName.Scan(value)
+	return ns.OauthRegisterOauthProvider.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullSubscriptionPlansName) Value() (driver.Value, error) {
+func (ns NullOauthRegisterOauthProvider) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.SubscriptionPlansName), nil
+	return string(ns.OauthRegisterOauthProvider), nil
 }
 
-type UsersStatus string
-
-const (
-	UsersStatusACTIVE    UsersStatus = "ACTIVE"
-	UsersStatusSUSPENDED UsersStatus = "SUSPENDED"
-	UsersStatusBANNED    UsersStatus = "BANNED"
-)
-
-func (e *UsersStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = UsersStatus(s)
-	case string:
-		*e = UsersStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for UsersStatus: %T", src)
-	}
-	return nil
-}
-
-type NullUsersStatus struct {
-	UsersStatus UsersStatus
-	Valid       bool // Valid is true if UsersStatus is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullUsersStatus) Scan(value interface{}) error {
-	if value == nil {
-		ns.UsersStatus, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.UsersStatus.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullUsersStatus) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.UsersStatus), nil
+type ChatBot struct {
+	ID             int64
+	ChatbotID      int64
+	UserID         int64
+	Title          string
+	CharacterCount int32
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
 }
 
 type NewsletterSubscribed struct {
 	ID    int64
 	Email string
+}
+
+type OauthRegister struct {
+	ID            int64
+	OauthProvider NullOauthRegisterOauthProvider
 }
 
 type Payment struct {
@@ -112,30 +85,38 @@ type Payment struct {
 }
 
 type SubscriptionPlan struct {
-	ID          int64
-	Name        SubscriptionPlansName
-	Description sql.NullString
-	Price       string
-	Duration    int32
+	ID                 int32
+	Name               string
+	Description        string
+	Price              string
+	MessageLimit       int32
+	CharacterLimit     int64
+	Chatbot            int32
+	MultipleFileUpload bool
+	ShowBranding       bool
+	ApiAccess          bool
 }
 
 type User struct {
 	ID             int64
 	Username       string
 	Email          string
-	Password       string
+	Password       sql.NullString
 	AvatarID       string
 	Permission     int32
+	SubscriptionID int64
+	FingerprintID  sql.NullString
+	OauthID        sql.NullInt64
 	EmailConfirmed bool
-	Status         UsersStatus
+	IsBanned       bool
 	CreatedAt      time.Time
 }
 
 type UserSubscription struct {
-	ID        int64
-	UserID    int64
-	PlanID    int32
-	StartDate time.Time
-	CreatedAt sql.NullTime
-	UpdatedAt sql.NullTime
+	ID           int64
+	PlanID       int32
+	OpenaiApiKey sql.NullString
+	ApiKey       string
+	CreatedAt    sql.NullTime
+	UpdatedAt    sql.NullTime
 }

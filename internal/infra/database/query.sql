@@ -5,7 +5,8 @@ SELECT id,
        avatar_id,
        permission,
        email_confirmed,
-       status
+       is_banned,
+       created_at
 FROM users
 WHERE id = ?;
 
@@ -17,7 +18,8 @@ SELECT id,
        password,
        permission,
        email_confirmed,
-       status
+       is_banned,
+       created_at
 FROM users
 WHERE email = ?;
 
@@ -28,13 +30,18 @@ SELECT id,
        avatar_id,
        permission,
        email_confirmed,
-       status
+       is_banned,
+       created_at
 FROM users
 WHERE username = ?;
 
 -- name: CreateUser :execlastid
-INSERT users (username, email, password)
-VALUES (?, ?, ?);
+INSERT users (username, email, password, subscription_id)
+VALUES (?, ?, ?, ?);
+
+-- name: CreateUserSubscription :execlastid
+INSERT user_subscriptions (api_key)
+VALUES (?);
 
 
 -- name: AddEmailToNewsletter :exec
