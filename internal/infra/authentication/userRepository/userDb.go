@@ -25,7 +25,7 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, userID int64) (*entit
 func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*entites.User, error) {
 	ctx, span := ur.tracer.Start(ctx, "get-user-by-email")
 	defer span.End()
-	
+
 	user, err := ur.database.GetUserByEmail(ctx, email)
 	if err != nil {
 		fmt.Println(err)
@@ -51,9 +51,26 @@ func (ur *UserRepository) CreateUser(ctx context.Context, username, email, passw
 	ctx, span := ur.tracer.Start(ctx, "create-user-subscription")
 	defer span.End()
 
+	tx, err := ur.db.BeginTx(ctx, nil)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		ur.logger.Error(err.Error())
+		return -1, err
+	}
+	defer func(tx *sql.Tx) {
+		err := tx.Rollback()
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			ur.logger.Error(err.Error())
+		}
+	}(tx)
+	qtx := ur.database.WithTx(tx)
+
 	apikey := snowflake.GenerateSha1SnowflakeIDWithTime()
 
-	subscriptionID, err := ur.database.CreateUserSubscription(ctx, apikey)
+	subscriptionID, err := qtx.CreateUserSubscription(ctx, apikey)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
@@ -63,13 +80,20 @@ func (ur *UserRepository) CreateUser(ctx context.Context, username, email, passw
 	ctx, span = ur.tracer.Start(ctx, "create-user")
 	defer span.End()
 
-	userID, err := ur.database.CreateUser(ctx, sqlc.CreateUserParams{
+	userID, err := qtx.CreateUser(ctx, sqlc.CreateUserParams{
 		Username:       username,
 		Email:          email,
 		Password:       sql.NullString{String: password, Valid: true},
 		SubscriptionID: subscriptionID,
 	})
 
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		ur.logger.Error(err.Error())
+		return -1, err
+	}
+	err = tx.Commit()
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())

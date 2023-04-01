@@ -39,7 +39,7 @@ func (as *AuthService) Login(ctx context.Context, email, password string) (int64
 		fmt.Println(err)
 		return -1, err
 	}
-	fmt.Println(err)
+
 	err = as.bcryptRepo.CompareHashAndPassword(ctx, userResult.Password, password)
 	if err != nil {
 		return -1, errors.New(`invalid email or password`)
