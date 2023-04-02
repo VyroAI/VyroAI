@@ -45,6 +45,7 @@ func (s *WebServiceHttpServer) Router() *fiber.App {
 		if err != nil {
 			return err
 		}
+		return nil
 	})
 
 	return app
