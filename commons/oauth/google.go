@@ -1,9 +1,9 @@
 package oauth
 
-import (
-	"golang.org/x/oauth2"
-)
+type Google struct {
+	*BaseProvider
+}
 
-var (
-	googleOauthConfig *oauth2.Config
-)
+func googleProvider(base *BaseProvider) *Google {
+	return &Google{base}
+}

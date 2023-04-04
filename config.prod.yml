@@ -1,0 +1,10 @@
+provider:
+  discord_login:
+    redirect_url: https://api.vyroai.com/v1/auth/discord/callback
+  google_login:
+    redirect_url: https://api.vyroai.com/v1/auth/google/callback
+database:
+  mysql:
+    url: PLANETSCALE_DB
+
+

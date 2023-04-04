@@ -6,27 +6,31 @@ import (
 	"fmt"
 	"github.com/vyroai/VyroAI/commons/otel"
 	"github.com/vyroai/VyroAI/internal/domain/authentication/repo"
+	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type Authentication interface {
 	Login(ctx context.Context, email, password string) (int64, error)
 	Register(ctx context.Context, username, email, password string) (int64, error)
+	GenerateDiscordAuthUrl(ctx context.Context) (string, error)
 }
 
 type AuthService struct {
-	tracer     trace.Tracer
-	userRepo   repo.AuthRepo
-	bcryptRepo repo.BcryptRepo
+	tracer       trace.Tracer
+	userRepo     repo.AuthRepo
+	bcryptRepo   repo.BcryptRepo
+	authProvider *authProviderRepository.AuthProvider
 }
 
-func NewAuthService(userRepo repo.AuthRepo, bcryptRepo repo.BcryptRepo) Authentication {
+func NewAuthService(userRepo repo.AuthRepo, bcryptRepo repo.BcryptRepo, authProvider *authProviderRepository.AuthProvider) Authentication {
 	tracer := otel.InitTracing("authenticationService", "0.1.0")
 
 	return &AuthService{
-		tracer:     tracer.NewTracer(),
-		userRepo:   userRepo,
-		bcryptRepo: bcryptRepo,
+		tracer:       tracer.NewTracer(),
+		userRepo:     userRepo,
+		bcryptRepo:   bcryptRepo,
+		authProvider: authProvider,
 	}
 }
 

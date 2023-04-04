@@ -21,41 +21,49 @@ type RegisterRequestPayload struct {
 func (s *WebServiceHttpServer) MountAuth(app *fiber.App) {
 	auth := app.Group("/v1/auth")
 
-	auth.Post("/login", func(c *fiber.Ctx) error {
-		var login LoginRequestPayload
+	auth.Post("/login", s.login)
+	auth.Post("/register", s.register)
 
-		if err := c.BodyParser(&login); err != nil {
-			response.ErrorJson(c, 401, err.Error())
-			return nil
-		}
+	auth.Get("/discord/login", s.discordLogin)
+	auth.Get("/discord/register", s.discordLogin)
 
-		user, err := s.authService.Login(c.Context(), login.Email, login.Password)
-		if err != nil {
-			response.ErrorJson(c, 401, "invalid email or password")
-			return nil
-		}
+	auth.Get("/discord/callback", s.discordLogin)
 
-		response.SuccessJson(c, 200, "", user)
+}
+
+func (s *WebServiceHttpServer) login(c *fiber.Ctx) error {
+	var login LoginRequestPayload
+
+	if err := c.BodyParser(&login); err != nil {
+		response.ErrorJson(c, 401, err.Error())
 		return nil
+	}
 
-	})
-
-	auth.Post("/register", func(c *fiber.Ctx) error {
-		var register RegisterRequestPayload
-
-		if err := c.BodyParser(&register); err != nil {
-			response.ErrorJson(c, 401, err.Error())
-			return nil
-		}
-
-		user, err := s.authService.Register(c.Context(), register.Username, register.Email, register.Password)
-		if err != nil {
-			response.ErrorJson(c, 401, err.Error())
-			return nil
-		}
-
-		response.SuccessJson(c, 200, "", user)
+	user, err := s.authService.Login(c.Context(), login.Email, login.Password)
+	if err != nil {
+		response.ErrorJson(c, 401, "invalid email or password")
 		return nil
+	}
 
-	})
+	response.SuccessJson(c, 200, "", user)
+	return nil
+}
+
+func (s *WebServiceHttpServer) register(c *fiber.Ctx) error {
+	var register RegisterRequestPayload
+
+	if err := c.BodyParser(&register); err != nil {
+		response.ErrorJson(c, 401, err.Error())
+		return nil
+	}
+
+	user, err := s.authService.Register(c.Context(), register.Username, register.Email, register.Password)
+	if err != nil {
+		response.ErrorJson(c, 401, err.Error())
+		return nil
+	}
+
+	response.SuccessJson(c, 200, "", user)
+	return nil
+
 }
