@@ -11,48 +11,48 @@ import (
 	"time"
 )
 
-type OauthRegisterOauthProvider string
+type OauthAccountOauthProvider string
 
 const (
-	OauthRegisterOauthProviderAPPLE     OauthRegisterOauthProvider = "APPLE"
-	OauthRegisterOauthProviderGOOGLE    OauthRegisterOauthProvider = "GOOGLE"
-	OauthRegisterOauthProviderINSTAGRAM OauthRegisterOauthProvider = "INSTAGRAM"
-	OauthRegisterOauthProviderDISCORD   OauthRegisterOauthProvider = "DISCORD"
+	OauthAccountOauthProviderAPPLE     OauthAccountOauthProvider = "APPLE"
+	OauthAccountOauthProviderGOOGLE    OauthAccountOauthProvider = "GOOGLE"
+	OauthAccountOauthProviderINSTAGRAM OauthAccountOauthProvider = "INSTAGRAM"
+	OauthAccountOauthProviderDISCORD   OauthAccountOauthProvider = "DISCORD"
 )
 
-func (e *OauthRegisterOauthProvider) Scan(src interface{}) error {
+func (e *OauthAccountOauthProvider) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = OauthRegisterOauthProvider(s)
+		*e = OauthAccountOauthProvider(s)
 	case string:
-		*e = OauthRegisterOauthProvider(s)
+		*e = OauthAccountOauthProvider(s)
 	default:
-		return fmt.Errorf("unsupported scan type for OauthRegisterOauthProvider: %T", src)
+		return fmt.Errorf("unsupported scan type for OauthAccountOauthProvider: %T", src)
 	}
 	return nil
 }
 
-type NullOauthRegisterOauthProvider struct {
-	OauthRegisterOauthProvider OauthRegisterOauthProvider
-	Valid                      bool // Valid is true if OauthRegisterOauthProvider is not NULL
+type NullOauthAccountOauthProvider struct {
+	OauthAccountOauthProvider OauthAccountOauthProvider
+	Valid                     bool // Valid is true if OauthAccountOauthProvider is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullOauthRegisterOauthProvider) Scan(value interface{}) error {
+func (ns *NullOauthAccountOauthProvider) Scan(value interface{}) error {
 	if value == nil {
-		ns.OauthRegisterOauthProvider, ns.Valid = "", false
+		ns.OauthAccountOauthProvider, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.OauthRegisterOauthProvider.Scan(value)
+	return ns.OauthAccountOauthProvider.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullOauthRegisterOauthProvider) Value() (driver.Value, error) {
+func (ns NullOauthAccountOauthProvider) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.OauthRegisterOauthProvider), nil
+	return string(ns.OauthAccountOauthProvider), nil
 }
 
 type ChatBot struct {
@@ -70,9 +70,11 @@ type NewsletterSubscribed struct {
 	Email string
 }
 
-type OauthRegister struct {
+type OauthAccount struct {
 	ID            int64
-	OauthProvider NullOauthRegisterOauthProvider
+	UserID        int64
+	OauthProvider NullOauthAccountOauthProvider
+	AccountID     string
 }
 
 type Payment struct {
@@ -104,9 +106,7 @@ type User struct {
 	Password       sql.NullString
 	AvatarID       string
 	Permission     int32
-	SubscriptionID int64
 	FingerprintID  sql.NullString
-	OauthID        sql.NullInt64
 	EmailConfirmed bool
 	IsBanned       bool
 	CreatedAt      time.Time
@@ -114,6 +114,7 @@ type User struct {
 
 type UserSubscription struct {
 	ID           int64
+	UserID       int64
 	PlanID       int32
 	OpenaiApiKey sql.NullString
 	ApiKey       string

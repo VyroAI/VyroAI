@@ -44,3 +44,16 @@ func userNameToDbToModel(userDB sqlc.GetUserByUsernameRow) *entites.User {
 		CreatedAt:      userDB.CreatedAt,
 	}
 }
+
+func userOauthToDbToModel(userDB sqlc.GetUserByOAuthIDRow) *entites.User {
+	return &entites.User{
+		Id:             userDB.ID,
+		Username:       userDB.Username,
+		Email:          userDB.Email,
+		AvatarID:       userDB.AvatarID,
+		Permission:     userDB.Permission,
+		IsBanned:       userDB.IsBanned,
+		EmailConfirmed: userDB.EmailConfirmed,
+		CreatedAt:      userDB.CreatedAt,
+	}
+}

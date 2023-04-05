@@ -16,7 +16,7 @@ func NewAuthProvider() *AuthProvider {
 		&oauth.BaseProvider{
 			Ctx:          context.Background(),
 			Scopes:       []string{"identify", "email"},
-			RedirectUrl:  "https://api.vyroai.com/v1/auth/callback/discord",
+			RedirectUrl:  "http://localhost:3000/v1/auth/discord/register/callback",
 			ClientId:     os.Getenv("DISCORD_CLIENT_ID"),
 			ClientSecret: os.Getenv("DISCORD_CLIENT_SECRET"),
 			AuthUrl:      "https://discord.com/api/oauth2/authorize",
@@ -31,7 +31,7 @@ func NewAuthProvider() *AuthProvider {
 				"https://www.googleapis.com/auth/userinfo.profile",
 				"https://www.googleapis.com/auth/userinfo.email",
 			},
-			RedirectUrl:  "https://api.vyroai.com/v1/auth/callback/google",
+			RedirectUrl:  "http://localhost:3000/v1/auth/discord/register/callback",
 			ClientId:     os.Getenv("GOOGLE_CLIENT_ID"),
 			ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 			AuthUrl:      "https://accounts.google.com/o/oauth2/auth",

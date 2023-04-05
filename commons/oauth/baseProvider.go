@@ -64,6 +64,10 @@ func (p *BaseProvider) BuildAuthUrl(state string, opts ...oauth2.AuthCodeOption)
 	return p.oauth2Config().AuthCodeURL(state, opts...)
 }
 
+func (p *BaseProvider) ExchangeCode(code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+	return p.oauth2Config().Exchange(p.Ctx, code, opts...)
+}
+
 func (p *BaseProvider) oauth2Config() *oauth2.Config {
 	return &oauth2.Config{
 		RedirectURL:  p.RedirectUrl,

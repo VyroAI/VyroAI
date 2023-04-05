@@ -24,10 +24,11 @@ func (s *WebServiceHttpServer) MountAuth(app *fiber.App) {
 	auth.Post("/login", s.login)
 	auth.Post("/register", s.register)
 
-	auth.Get("/discord/login", s.discordLogin)
-	auth.Get("/discord/register", s.discordLogin)
+	auth.Get("/:provider/login", s.generateUrl)
+	auth.Get("/:provider/register", s.generateUrl)
 
-	auth.Get("/discord/callback", s.discordLogin)
+	auth.Get("/:provider/login/callback", s.callbackLogin)
+	auth.Get("/:provider/register/callback", s.callbackRegister)
 
 }
 

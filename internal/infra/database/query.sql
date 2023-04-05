@@ -35,13 +35,34 @@ SELECT id,
 FROM users
 WHERE username = ?;
 
--- name: CreateUser :execlastid
-INSERT users (username, email, password, subscription_id)
-VALUES (?, ?, ?, ?);
 
--- name: CreateUserSubscription :execlastid
-INSERT user_subscriptions (api_key)
-VALUES (?);
+-- name: GetUserByOAuthID :one
+SELECT users.id,
+       username,
+       email,
+       avatar_id,
+       permission,
+       email_confirmed,
+       is_banned,
+       created_at,
+       account_id
+FROM users
+         INNER JOIN oauth_account
+                    ON oauth_account.user_id = users.id
+
+WHERE account_id = ?;
+
+-- name: CreateOAuthAccount :exec
+INSERT oauth_account (user_id, oauth_provider, account_id)
+VALUES (?, ?, ?);
+
+-- name: CreateUser :execlastid
+INSERT users (username, email, password)
+VALUES (?, ?, ?);
+
+-- name: CreateUserSubscription :exec
+INSERT user_subscriptions (user_id, api_key)
+VALUES (?, ?);
 
 
 -- name: AddEmailToNewsletter :exec

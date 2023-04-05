@@ -3,7 +3,6 @@ package authentication
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/vyroai/VyroAI/commons/otel"
 	"github.com/vyroai/VyroAI/internal/domain/authentication/repo"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
@@ -13,7 +12,10 @@ import (
 type Authentication interface {
 	Login(ctx context.Context, email, password string) (int64, error)
 	Register(ctx context.Context, username, email, password string) (int64, error)
-	GenerateDiscordAuthUrl(ctx context.Context) (string, error)
+
+	GenerateDiscordAuthUrl(ctx context.Context, action string) (string, error)
+	DiscordProviderLogin(ctx context.Context, code, state string) (int64, error)
+	DiscordProviderRegister(ctx context.Context, code, state string) (int64, error)
 }
 
 type AuthService struct {
@@ -40,7 +42,6 @@ func (as *AuthService) Login(ctx context.Context, email, password string) (int64
 
 	userResult, err := as.userRepo.GetUserByEmail(ctx, email)
 	if err != nil {
-		fmt.Println(err)
 		return -1, err
 	}
 

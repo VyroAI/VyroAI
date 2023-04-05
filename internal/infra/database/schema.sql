@@ -1,26 +1,25 @@
 CREATE TABLE users
 (
     id              bigint(19) UNSIGNED NOT NULL AUTO_INCREMENT,
-    username        varchar(64)         NOT NULL UNIQUE,
+    username        varchar(64)         NOT NULL,
     email           varchar(100)        NOT NULL UNIQUE,
     password        varchar(100),
     avatar_id       varchar(64)         NOT NULL DEFAULT "3eb0f8fa-a594-4348-9d89-9ab7c9be4842",
     permission      TINYINT             NOT NULL DEFAULT 0,
-    subscription_id bigint(19) UNSIGNED NOT NULL,
     fingerprint_id  varchar(64),
-    oauth_id        bigint(19) UNSIGNED,
     email_confirmed TINYINT(1)          NOT NULL DEFAULT 0,
     is_banned       TINYINT(1)          NOT NULL DEFAULT 0,
     created_at      TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE oauth_register
+CREATE TABLE oauth_account
 (
     id             bigint(19) UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id        bigint(19) UNSIGNED NOT NULL,
     oauth_provider ENUM ("APPLE","GOOGLE","INSTAGRAM","DISCORD"),
-
-    PRIMARY KEY (id)
+    account_id     varchar(64)         NOT NULL UNIQUE,
+    PRIMARY KEY (id, account_id)
 );
 
 
@@ -28,6 +27,7 @@ CREATE TABLE oauth_register
 CREATE TABLE user_subscriptions
 (
     id             bigint(19) UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id        bigint(19) UNSIGNED NOT NULL,
     plan_id        TINYINT UNSIGNED    NOT NULL DEFAULT 1,
     openai_api_key varchar(160),
     api_key        varchar(160)        NOT NULL UNIQUE,
@@ -61,8 +61,9 @@ CREATE TABLE chat_bot
     user_id         bigint(19) UNSIGNED NOT NULL,
     title           varchar(100)        NOT NULL,
     character_count INT UNSIGNED        NOT NULL,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    private         TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id, chatbot_id)
 );

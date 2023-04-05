@@ -22,6 +22,7 @@ type Provider interface {
 	sendRawUserDataRequest(req *http.Request, token *oauth2.Token) ([]byte, error)
 	FetchRawUserData(token *oauth2.Token) ([]byte, error)
 	BuildAuthUrl(state string, opts ...oauth2.AuthCodeOption) string
+	ExchangeCode(code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error)
 }
 
 func NewProviderByName(name string, base *BaseProvider) (Provider, error) {

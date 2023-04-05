@@ -21,42 +21,54 @@ func (q *Queries) AddEmailToNewsletter(ctx context.Context, email string) error 
 	return err
 }
 
+const createOAuthAccount = `-- name: CreateOAuthAccount :exec
+INSERT oauth_account (user_id, oauth_provider, account_id)
+VALUES (?, ?, ?)
+`
+
+type CreateOAuthAccountParams struct {
+	UserID        int64
+	OauthProvider NullOauthAccountOauthProvider
+	AccountID     string
+}
+
+func (q *Queries) CreateOAuthAccount(ctx context.Context, arg CreateOAuthAccountParams) error {
+	_, err := q.db.ExecContext(ctx, createOAuthAccount, arg.UserID, arg.OauthProvider, arg.AccountID)
+	return err
+}
+
 const createUser = `-- name: CreateUser :execlastid
-INSERT users (username, email, password, subscription_id)
-VALUES (?, ?, ?, ?)
+INSERT users (username, email, password)
+VALUES (?, ?, ?)
 `
 
 type CreateUserParams struct {
-	Username       string
-	Email          string
-	Password       sql.NullString
-	SubscriptionID int64
+	Username string
+	Email    string
+	Password sql.NullString
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createUser,
-		arg.Username,
-		arg.Email,
-		arg.Password,
-		arg.SubscriptionID,
-	)
+	result, err := q.db.ExecContext(ctx, createUser, arg.Username, arg.Email, arg.Password)
 	if err != nil {
 		return 0, err
 	}
 	return result.LastInsertId()
 }
 
-const createUserSubscription = `-- name: CreateUserSubscription :execlastid
-INSERT user_subscriptions (api_key)
-VALUES (?)
+const createUserSubscription = `-- name: CreateUserSubscription :exec
+INSERT user_subscriptions (user_id, api_key)
+VALUES (?, ?)
 `
 
-func (q *Queries) CreateUserSubscription(ctx context.Context, apiKey string) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createUserSubscription, apiKey)
-	if err != nil {
-		return 0, err
-	}
-	return result.LastInsertId()
+type CreateUserSubscriptionParams struct {
+	UserID int64
+	ApiKey string
+}
+
+func (q *Queries) CreateUserSubscription(ctx context.Context, arg CreateUserSubscriptionParams) error {
+	_, err := q.db.ExecContext(ctx, createUserSubscription, arg.UserID, arg.ApiKey)
+	return err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
@@ -138,6 +150,52 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, er
 		&i.EmailConfirmed,
 		&i.IsBanned,
 		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUserByOAuthID = `-- name: GetUserByOAuthID :one
+SELECT users.id,
+       username,
+       email,
+       avatar_id,
+       permission,
+       email_confirmed,
+       is_banned,
+       created_at,
+       account_id
+FROM users
+         INNER JOIN oauth_account
+                    ON oauth_account.user_id = users.id
+
+WHERE account_id = ?
+`
+
+type GetUserByOAuthIDRow struct {
+	ID             int64
+	Username       string
+	Email          string
+	AvatarID       string
+	Permission     int32
+	EmailConfirmed bool
+	IsBanned       bool
+	CreatedAt      time.Time
+	AccountID      string
+}
+
+func (q *Queries) GetUserByOAuthID(ctx context.Context, accountID string) (GetUserByOAuthIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByOAuthID, accountID)
+	var i GetUserByOAuthIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.AvatarID,
+		&i.Permission,
+		&i.EmailConfirmed,
+		&i.IsBanned,
+		&i.CreatedAt,
+		&i.AccountID,
 	)
 	return i, err
 }
