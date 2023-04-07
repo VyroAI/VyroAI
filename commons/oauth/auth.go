@@ -21,7 +21,8 @@ type Provider interface {
 	Client(token *oauth2.Token) *http.Client
 	sendRawUserDataRequest(req *http.Request, token *oauth2.Token) ([]byte, error)
 	FetchRawUserData(token *oauth2.Token) ([]byte, error)
-	BuildAuthUrl(state string, opts ...oauth2.AuthCodeOption) string
+	BuildLoginUrl(state string, opts ...oauth2.AuthCodeOption) string
+	BuildRegisterUrl(state string, opts ...oauth2.AuthCodeOption) string
 	ExchangeCode(code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error)
 }
 

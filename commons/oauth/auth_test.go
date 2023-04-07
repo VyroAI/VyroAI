@@ -15,7 +15,7 @@ func TestDiscordProvider(t *testing.T) {
 		ClientSecret: "pa4ccVHlcfqFTN9dCr_7vO5nnsf6f1CP",
 		Scopes:       []string{"identify", "email"},
 	}
-	fmt.Println(b.BuildAuthUrl("Hello"))
+	fmt.Println(b.BuildLoginUrl("Hello"))
 }
 
 func TestNewDiscordProvider(t *testing.T) {
@@ -31,5 +31,5 @@ func TestNewDiscordProvider(t *testing.T) {
 			UserApiUrl:   "https://discord.com/api/users/@me",
 		})
 
-	fmt.Println(discord.BuildAuthUrl("hello"))
+	fmt.Println(discord.BuildLoginUrl("hello"))
 }

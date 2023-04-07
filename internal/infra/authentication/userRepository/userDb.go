@@ -120,14 +120,7 @@ func (ur *UserRepository) CreateUserWithOauthID(ctx context.Context, username, e
 		ur.logger.Error(err.Error())
 		return -1, err
 	}
-	defer func(tx *sql.Tx) {
-		err := tx.Rollback()
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, err.Error())
-			ur.logger.Error(err.Error())
-		}
-	}(tx)
+	defer tx.Rollback()
 	qtx := ur.database.WithTx(tx)
 
 	userID, err := qtx.CreateUser(ctx, sqlc.CreateUserParams{

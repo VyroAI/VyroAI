@@ -10,12 +10,12 @@ import (
 )
 
 type Authentication interface {
-	Login(ctx context.Context, email, password string) (int64, error)
-	Register(ctx context.Context, username, email, password string) (int64, error)
+	Login(ctx context.Context, email, password string) (int64, int32, error)
+	Register(ctx context.Context, username, email, password string) (int64, int32, error)
 
 	GenerateDiscordAuthUrl(ctx context.Context, action string) (string, error)
-	DiscordProviderLogin(ctx context.Context, code, state string) (int64, error)
-	DiscordProviderRegister(ctx context.Context, code, state string) (int64, error)
+	DiscordProviderLogin(ctx context.Context, code, state string) (int64, int32, error)
+	DiscordProviderRegister(ctx context.Context, code, state string) (int64, int32, error)
 }
 
 type AuthService struct {
@@ -36,47 +36,47 @@ func NewAuthService(userRepo repo.AuthRepo, bcryptRepo repo.BcryptRepo, authProv
 	}
 }
 
-func (as *AuthService) Login(ctx context.Context, email, password string) (int64, error) {
+func (as *AuthService) Login(ctx context.Context, email, password string) (int64, int32, error) {
 	ctx, span := as.tracer.Start(ctx, "login")
 	defer span.End()
 
 	userResult, err := as.userRepo.GetUserByEmail(ctx, email)
 	if err != nil {
-		return -1, err
+		return -1, -1, err
 	}
 
 	err = as.bcryptRepo.CompareHashAndPassword(ctx, userResult.Password, password)
 	if err != nil {
-		return -1, errors.New(`invalid email or password`)
+		return -1, -1, errors.New(`invalid email or password`)
 	}
 
-	return userResult.Id, nil
+	return userResult.Id, userResult.Permission, nil
 }
 
-func (as *AuthService) Register(ctx context.Context, username, email, password string) (int64, error) {
+func (as *AuthService) Register(ctx context.Context, username, email, password string) (int64, int32, error) {
 	ctx, span := as.tracer.Start(ctx, "register")
 	defer span.End()
 
 	_, err := as.userRepo.GetUserByEmail(ctx, email)
 	if err == nil {
-		return -1, errors.New("email already exist")
+		return -1, -1, errors.New("email already exist")
 	}
 
 	_, err = as.userRepo.GetUserByUsername(ctx, username)
 	if err == nil {
-		return -1, errors.New("username already exist")
+		return -1, -1, errors.New("username already exist")
 	}
 
 	hashedPassword, err := as.bcryptRepo.GenerateFromPassword(ctx, password)
 	if err != nil {
-		return -1, errors.New(`server error`)
+		return -1, -1, errors.New(`server error`)
 	}
 
 	userID, err := as.userRepo.CreateUser(ctx, username, email, hashedPassword)
 	if err != nil {
-		return -1, errors.New(`server error`)
+		return -1, -1, errors.New(`server error`)
 	}
 
-	return userID, nil
+	return userID, 1, nil
 
 }

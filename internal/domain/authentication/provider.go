@@ -18,87 +18,80 @@ func (as *AuthService) GenerateDiscordAuthUrl(ctx context.Context, action string
 
 	switch strings.ToLower(action) {
 	case "login":
-		url = as.authProvider.DiscordProvider.BuildAuthUrl("hello")
+		url = as.authProvider.DiscordProvider.BuildLoginUrl("hello")
 	case "register":
-		url = as.authProvider.DiscordProvider.BuildAuthUrl("hello")
+		url = as.authProvider.DiscordProvider.BuildRegisterUrl("hello")
 
 	}
 	return url, nil
 }
 
-func (as *AuthService) DiscordProviderLogin(ctx context.Context, code, state string) (int64, error) {
+func (as *AuthService) DiscordProviderLogin(ctx context.Context, code, state string) (int64, int32, error) {
 	ctx, span := as.tracer.Start(ctx, "discord-provider-login")
 	defer span.End()
 
 	token, err := as.authProvider.DiscordProvider.ExchangeCode(code)
 	if err != nil {
 		log.Println(err)
-		return -1, err
+		return -1, -1, err
 	}
 
 	discordUser, err := as.authProvider.DiscordProvider.FetchRawUserData(token)
 	if err != nil {
 		log.Println(err)
-		return -1, err
+		return -1, -1, err
 	}
 	var discord entites.DiscordUser
 
 	err = json.Unmarshal(discordUser, &discord)
 	if err != nil {
-		return -1, err
+		return -1, -1, err
 	}
 
 	user, err := as.userRepo.GetUserFromOAuthID(ctx, discord.Id)
 	if err != nil {
 		fmt.Println(err)
-		return -1, err
+		return -1, -1, err
 	}
-	fmt.Println(user)
 
-	return user.Id, err
+	return user.Id, user.Permission, err
 }
 
-func (as *AuthService) DiscordProviderRegister(ctx context.Context, code, state string) (int64, error) {
+func (as *AuthService) DiscordProviderRegister(ctx context.Context, code, state string) (int64, int32, error) {
 	ctx, span := as.tracer.Start(ctx, "discord-provider-register")
 	defer span.End()
 
 	token, err := as.authProvider.DiscordProvider.ExchangeCode(code)
 	if err != nil {
-		log.Println(err)
-		return -1, err
+		return -1, -1, err
 	}
 
 	discordUser, err := as.authProvider.DiscordProvider.FetchRawUserData(token)
 	if err != nil {
-		log.Println(err)
-		return -1, err
+		return -1, -1, err
 	}
 	var discord entites.DiscordUser
 
 	err = json.Unmarshal(discordUser, &discord)
 	if err != nil {
-		return -1, err
+		return -1, -1, err
 	}
 
 	_, err = as.userRepo.GetUserFromOAuthID(ctx, discord.Id)
 	if err == nil {
-		fmt.Println(err)
-		return -1, errors.New("account already exist")
+		return -1, -1, errors.New("account already exist")
 	}
 
-	item, err := as.userRepo.GetUserByEmail(ctx, discord.Email)
+	_, err = as.userRepo.GetUserByEmail(ctx, discord.Email)
 	if err == nil {
-		fmt.Println(err)
-		return -1, errors.New("email already exist")
+		return -1, -1, errors.New("email already exist")
 	}
-
-	fmt.Println(item)
 
 	userID, err := as.userRepo.CreateUserWithOauthID(ctx, discord.Username, discord.Email, "discord", discord.Id)
 	if err != nil {
-		return -1, errors.New(`server error`)
+		return -1, -1, errors.New(`server error`)
 	}
 
-	return userID, nil
+	return userID, 1, nil
 
 }

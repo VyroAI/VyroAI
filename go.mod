@@ -4,7 +4,9 @@ go 1.20
 
 require (
 	github.com/go-sql-driver/mysql v1.7.0
+	github.com/gofiber/contrib/otelfiber v1.0.3
 	github.com/gofiber/fiber/v2 v2.43.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
 	go.opentelemetry.io/otel v1.14.0
@@ -23,7 +25,6 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/gofiber/contrib/otelfiber v1.0.3 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2 // indirect
@@ -32,7 +33,6 @@ require (
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
-	github.com/psmarcin/fiber-opentelemetry v1.2.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect

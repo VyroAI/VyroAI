@@ -9,14 +9,16 @@ import (
 )
 
 type BaseProvider struct {
-	Ctx          context.Context
-	Scopes       []string
-	ClientId     string
-	ClientSecret string
-	RedirectUrl  string
-	AuthUrl      string
-	TokenUrl     string
-	UserApiUrl   string
+	Ctx                 context.Context
+	Scopes              []string
+	ClientId            string
+	ClientSecret        string
+	RedirectUrl         string
+	RedirectLoginUrl    string
+	RedirectRegisterUrl string
+	AuthUrl             string
+	TokenUrl            string
+	UserApiUrl          string
 }
 
 // Client implements Provider.Client() interface method.
@@ -60,8 +62,17 @@ func (p *BaseProvider) FetchRawUserData(token *oauth2.Token) ([]byte, error) {
 	return p.sendRawUserDataRequest(req, token)
 }
 
-func (p *BaseProvider) BuildAuthUrl(state string, opts ...oauth2.AuthCodeOption) string {
+func (p *BaseProvider) BuildLoginUrl(state string, opts ...oauth2.AuthCodeOption) string {
+	p.SetRedirectUrl(p.RedirectLoginUrl)
 	return p.oauth2Config().AuthCodeURL(state, opts...)
+}
+func (p *BaseProvider) BuildRegisterUrl(state string, opts ...oauth2.AuthCodeOption) string {
+	p.SetRedirectUrl(p.RedirectRegisterUrl)
+	return p.oauth2Config().AuthCodeURL(state, opts...)
+}
+
+func (p *BaseProvider) SetRedirectUrl(url string) {
+	p.RedirectUrl = url
 }
 
 func (p *BaseProvider) ExchangeCode(code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
