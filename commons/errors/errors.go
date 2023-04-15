@@ -8,6 +8,7 @@ import (
 const (
 	NoType       = ErrorType(iota)
 	ErrInvalid   = ErrorType(iota)
+	ErrExist     = ErrorType(iota)
 	ErrForbidden = ErrorType(iota)
 	ErrNotFound  = ErrorType(iota)
 	ErrInternal  = ErrorType(iota)

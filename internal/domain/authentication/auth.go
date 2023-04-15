@@ -2,7 +2,7 @@ package authentication
 
 import (
 	"context"
-	"errors"
+	"github.com/vyroai/VyroAI/commons/errors"
 	"github.com/vyroai/VyroAI/commons/otel"
 	"github.com/vyroai/VyroAI/internal/domain/authentication/repo"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
@@ -41,13 +41,13 @@ func (as *AuthService) Login(ctx context.Context, email, password string) (int64
 	defer span.End()
 
 	userResult, err := as.userRepo.GetUserByEmail(ctx, email)
-	if err != nil {
+	if userResult == nil || err != nil {
 		return -1, -1, err
 	}
 
 	err = as.bcryptRepo.CompareHashAndPassword(ctx, userResult.Password, password)
 	if err != nil {
-		return -1, -1, errors.New(`invalid email or password`)
+		return -1, -1, errors.ErrInvalid.Error()
 	}
 
 	return userResult.Id, userResult.Permission, nil
@@ -57,24 +57,30 @@ func (as *AuthService) Register(ctx context.Context, username, email, password s
 	ctx, span := as.tracer.Start(ctx, "register")
 	defer span.End()
 
-	_, err := as.userRepo.GetUserByEmail(ctx, email)
-	if err == nil {
-		return -1, -1, errors.New("email already exist")
+	userByEmail, err := as.userRepo.GetUserByEmail(ctx, email)
+	if errors.GetType(err) != errors.ErrNotFound && err != nil {
+		return -1, -1, err
+	}
+	if userByEmail != nil {
+		return -1, -1, errors.ErrExist.New("Email already exist")
 	}
 
-	_, err = as.userRepo.GetUserByUsername(ctx, username)
-	if err == nil {
-		return -1, -1, errors.New("username already exist")
+	userByUsername, err := as.userRepo.GetUserByUsername(ctx, username)
+	if errors.GetType(err) != errors.ErrNotFound && err != nil {
+		return -1, -1, err
+	}
+	if userByUsername != nil {
+		return -1, -1, errors.ErrExist.New("Username already exist")
 	}
 
 	hashedPassword, err := as.bcryptRepo.GenerateFromPassword(ctx, password)
 	if err != nil {
-		return -1, -1, errors.New(`server error`)
+		return -1, -1, err
 	}
 
 	userID, err := as.userRepo.CreateUser(ctx, username, email, hashedPassword)
 	if err != nil {
-		return -1, -1, errors.New(`server error`)
+		return -1, -1, err
 	}
 
 	return userID, 1, nil

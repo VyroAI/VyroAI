@@ -3,6 +3,8 @@ package userRepository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"github.com/vyroai/VyroAI/commons/errors"
 	"github.com/vyroai/VyroAI/commons/snowflake"
 	"github.com/vyroai/VyroAI/internal/domain/authentication/entites"
 	"github.com/vyroai/VyroAI/internal/infra/database/sqlc"
@@ -15,7 +17,14 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, userID int64) (*entit
 
 	user, err := ur.database.GetUserByID(ctx, userID)
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, errors.ErrNotFound.Wrap(err, "get user by id")
+		} else {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, fmt.Sprintf("unknown error,  %+v\n", err))
+			ur.logger.Error(fmt.Sprintf("unknown error,  %+v\n", err))
+			return nil, err
+		}
 	}
 
 	return userIdDbToModel(user), nil
@@ -27,9 +36,15 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*en
 
 	user, err := ur.database.GetUserByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, errors.ErrNotFound.Wrap(err, "get user by email")
+		} else {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, fmt.Sprintf("unknown error,  %+v\n", err))
+			ur.logger.Error(fmt.Sprintf("unknown error,  %+v\n", err))
+			return nil, err
+		}
 	}
-
 	return userEmailDbToModel(user), nil
 }
 
@@ -39,7 +54,14 @@ func (ur *UserRepository) GetUserByUsername(ctx context.Context, username string
 
 	user, err := ur.database.GetUserByUsername(ctx, username)
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, errors.ErrNotFound.Wrap(err, "get user by username")
+		} else {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, fmt.Sprintf("unknown error,  %+v\n", err))
+			ur.logger.Error(fmt.Sprintf("unknown error,  %+v\n", err))
+			return nil, err
+		}
 	}
 
 	return userNameToDbToModel(user), nil
@@ -103,7 +125,14 @@ func (ur *UserRepository) GetUserFromOAuthID(ctx context.Context, oauthID string
 
 	user, err := ur.database.GetUserByOAuthID(ctx, oauthID)
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, errors.ErrNotFound.Wrap(err, "get user by oauth-id")
+		} else {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, fmt.Sprintf("unknown error,  %+v\n", err))
+			ur.logger.Error(fmt.Sprintf("unknown error,  %+v\n", err))
+			return nil, err
+		}
 	}
 
 	return userOauthToDbToModel(user), nil

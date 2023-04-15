@@ -3,6 +3,7 @@ package httpd
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/vyroai/VyroAI/commons/api/response"
+	"github.com/vyroai/VyroAI/commons/errors"
 	"github.com/vyroai/VyroAI/commons/jwt"
 )
 
@@ -28,9 +29,19 @@ func (s *WebServiceHttpServer) login(c *fiber.Ctx) error {
 	}
 
 	userID, permission, err := s.authService.Login(c.Context(), login.Email, login.Password)
+
 	if err != nil {
-		response.ErrorJson(c, 401, "invalid email or password")
-		return nil
+		switch errors.GetType(err) {
+		case errors.ErrInvalid:
+			response.SuccessMessage(c, 401, "Invalid Email or Password")
+			return nil
+		case errors.ErrNotFound:
+			response.SuccessMessage(c, 401, "Invalid Email or Password")
+			return nil
+		default:
+			response.ServerError(c)
+			return nil
+		}
 	}
 
 	response.SuccessJson(c, 200, "Successfully created login", jwt.GenerateJwtToken(userID, permission))
@@ -47,8 +58,14 @@ func (s *WebServiceHttpServer) register(c *fiber.Ctx) error {
 
 	userID, permission, err := s.authService.Register(c.Context(), register.Username, register.Email, register.Password)
 	if err != nil {
-		response.ErrorJson(c, 401, err.Error())
-		return nil
+		switch errors.GetType(err) {
+		case errors.ErrExist:
+			response.SuccessMessage(c, 409, err.Error())
+			return nil
+		default:
+			response.ServerError(c)
+			return nil
+		}
 	}
 
 	response.SuccessJson(c, 201, "Successfully created an account", jwt.GenerateJwtToken(userID, permission))
