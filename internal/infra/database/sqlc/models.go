@@ -61,6 +61,7 @@ type ChatBot struct {
 	UserID         int64
 	Title          string
 	CharacterCount int32
+	Private        bool
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
