@@ -33,10 +33,10 @@ func (s *WebServiceHttpServer) login(c *fiber.Ctx) error {
 	if err != nil {
 		switch errors.GetType(err) {
 		case errors.ErrInvalid:
-			response.SuccessMessage(c, 401, "Invalid Email or Password")
+			response.ErrorJson(c, 401, "Invalid Email or Password")
 			return nil
 		case errors.ErrNotFound:
-			response.SuccessMessage(c, 401, "Invalid Email or Password")
+			response.ErrorJson(c, 401, "Invalid Email or Password")
 			return nil
 		default:
 			response.ServerError(c)
@@ -60,7 +60,7 @@ func (s *WebServiceHttpServer) register(c *fiber.Ctx) error {
 	if err != nil {
 		switch errors.GetType(err) {
 		case errors.ErrExist:
-			response.SuccessMessage(c, 409, err.Error())
+			response.ErrorJson(c, 409, err.Error())
 			return nil
 		default:
 			response.ServerError(c)

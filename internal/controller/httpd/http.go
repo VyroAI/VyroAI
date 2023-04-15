@@ -40,6 +40,8 @@ func (s *WebServiceHttpServer) Router() *fiber.App {
 
 	s.MountAuth(app)
 
+	s.MountDashboard(app)
+
 	app.Get("/health", func(ctx *fiber.Ctx) error {
 		err := ctx.SendString("ok")
 		if err != nil {
