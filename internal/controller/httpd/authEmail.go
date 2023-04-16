@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/vyroai/VyroAI/commons/api/response"
 	"github.com/vyroai/VyroAI/commons/errors"
+	"github.com/vyroai/VyroAI/commons/helper/formSantanizer"
 	"github.com/vyroai/VyroAI/commons/jwt"
 )
 
@@ -25,6 +26,16 @@ func (s *WebServiceHttpServer) login(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&login); err != nil {
 		response.ErrorJson(c, 401, err.Error())
+		return nil
+	}
+
+	if !formSantanizer.IsValidEmail(login.Email) {
+		response.ErrorJson(c, 400, "invalid payload")
+		return nil
+	}
+
+	if !formSantanizer.IsPasswordValid(login.Password) {
+		response.ErrorJson(c, 400, "invalid payload")
 		return nil
 	}
 
@@ -53,6 +64,19 @@ func (s *WebServiceHttpServer) register(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&register); err != nil {
 		response.ErrorJson(c, 401, err.Error())
+		return nil
+	}
+
+	if !formSantanizer.IsValidEmail(register.Email) {
+		response.ErrorJson(c, 400, "invalid payload")
+		return nil
+	}
+	if formSantanizer.IsValidUsername(register.Username) {
+		response.ErrorJson(c, 400, "invalid payload")
+		return nil
+	}
+	if !formSantanizer.IsPasswordValid(register.Password) {
+		response.ErrorJson(c, 400, "invalid payload")
 		return nil
 	}
 

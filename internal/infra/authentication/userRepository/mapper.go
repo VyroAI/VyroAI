@@ -1,12 +1,12 @@
 package userRepository
 
 import (
-	"github.com/vyroai/VyroAI/internal/domain/authentication/entites"
+	"github.com/vyroai/VyroAI/internal/domain/models"
 	"github.com/vyroai/VyroAI/internal/infra/database/sqlc"
 )
 
-func userIdDbToModel(userDB sqlc.GetUserByIDRow) *entites.User {
-	return &entites.User{
+func userIdDbToModel(userDB sqlc.GetUserByIDRow) *models.User {
+	return &models.User{
 		Id:             userDB.ID,
 		Username:       userDB.Username,
 		Email:          userDB.Email,
@@ -18,8 +18,8 @@ func userIdDbToModel(userDB sqlc.GetUserByIDRow) *entites.User {
 	}
 }
 
-func userEmailDbToModel(userDB sqlc.GetUserByEmailRow) *entites.User {
-	return &entites.User{
+func userEmailDbToModel(userDB sqlc.GetUserByEmailRow) *models.User {
+	return &models.User{
 		Id:             userDB.ID,
 		Username:       userDB.Username,
 		Email:          userDB.Email,
@@ -32,8 +32,8 @@ func userEmailDbToModel(userDB sqlc.GetUserByEmailRow) *entites.User {
 	}
 }
 
-func userNameToDbToModel(userDB sqlc.GetUserByUsernameRow) *entites.User {
-	return &entites.User{
+func userNameToDbToModel(userDB sqlc.GetUserByUsernameRow) *models.User {
+	return &models.User{
 		Id:             userDB.ID,
 		Username:       userDB.Username,
 		Email:          userDB.Email,
@@ -45,8 +45,8 @@ func userNameToDbToModel(userDB sqlc.GetUserByUsernameRow) *entites.User {
 	}
 }
 
-func userOauthToDbToModel(userDB sqlc.GetUserByOAuthIDRow) *entites.User {
-	return &entites.User{
+func userOauthToDbToModel(userDB sqlc.GetUserByOAuthIDRow) *models.User {
+	return &models.User{
 		Id:             userDB.ID,
 		Username:       userDB.Username,
 		Email:          userDB.Email,

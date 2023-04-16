@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"github.com/vyroai/VyroAI/commons/errors"
 	"github.com/vyroai/VyroAI/commons/snowflake"
-	"github.com/vyroai/VyroAI/internal/domain/authentication/entites"
+	"github.com/vyroai/VyroAI/internal/domain/models"
 	"github.com/vyroai/VyroAI/internal/infra/database/sqlc"
 	"go.opentelemetry.io/otel/codes"
 )
 
-func (ur *UserRepository) GetUserByID(ctx context.Context, userID int64) (*entites.User, error) {
+func (ur *UserRepository) GetUserByID(ctx context.Context, userID int64) (*models.User, error) {
 	ctx, span := ur.tracer.Start(ctx, "get-user-by-id")
 	defer span.End()
 
@@ -30,7 +30,7 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, userID int64) (*entit
 	return userIdDbToModel(user), nil
 }
 
-func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*entites.User, error) {
+func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	ctx, span := ur.tracer.Start(ctx, "get-user-by-email")
 	defer span.End()
 
@@ -48,7 +48,7 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*en
 	return userEmailDbToModel(user), nil
 }
 
-func (ur *UserRepository) GetUserByUsername(ctx context.Context, username string) (*entites.User, error) {
+func (ur *UserRepository) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	ctx, span := ur.tracer.Start(ctx, "get-user-by-username")
 	defer span.End()
 
@@ -119,7 +119,7 @@ func (ur *UserRepository) CreateUser(ctx context.Context, username, email, passw
 	return userID, nil
 }
 
-func (ur *UserRepository) GetUserFromOAuthID(ctx context.Context, oauthID string) (*entites.User, error) {
+func (ur *UserRepository) GetUserFromOAuthID(ctx context.Context, oauthID string) (*models.User, error) {
 	ctx, span := ur.tracer.Start(ctx, "get-user-by-oauth-id")
 	defer span.End()
 
