@@ -2,7 +2,6 @@ package profileRepo
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"github.com/vyroai/VyroAI/commons/errors"
 	"github.com/vyroai/VyroAI/internal/domain/models"
@@ -15,14 +14,15 @@ func (pr *ProfileRepository) GetProfileWithChat(ctx context.Context, userID int6
 
 	profile, err := pr.database.GetProfileAndChats(ctx, userID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.ErrNotFound.Wrap(err, "get profile and chat")
-		} else {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, fmt.Sprintf("unknown error,  %+v\n", err))
-			pr.logger.Error(fmt.Sprintf("unknown error,  %+v\n", err))
-			return nil, err
-		}
+		span.RecordError(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("unknown error,  %+v\n", err))
+		pr.logger.Error(fmt.Sprintf("unknown error,  %+v\n", err))
+		return nil, err
 	}
+
+	if len(profile) == 0 {
+		return nil, errors.ErrNotFound.Wrap(err, "get profile and chat")
+	}
+
 	return profileToModel(profile), nil
 }

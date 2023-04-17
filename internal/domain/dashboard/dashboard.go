@@ -7,7 +7,7 @@ import (
 )
 
 type Dashboard interface {
-	GetProfile(ctx context.Context, userID int64) (*models.Profile, error)
+	GetProfile(ctx context.Context) (*models.Profile, error)
 }
 
 type Service struct {

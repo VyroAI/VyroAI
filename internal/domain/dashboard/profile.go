@@ -13,9 +13,8 @@ import (
 //	return user, err
 //}
 
-func (ds *Service) GetProfile(ctx context.Context, userID int64) (*models.Profile, error) {
-	profile, err := ds.profileRepo.GetProfileWithChat(ctx, userID)
-
+func (ds *Service) GetProfile(ctx context.Context) (*models.Profile, error) {
+	profile, err := ds.profileRepo.GetProfileWithChat(ctx, ctx.Value("userID").(int64))
 	if err != nil {
 		return nil, err
 	}

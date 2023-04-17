@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strings"
 )
@@ -36,7 +35,6 @@ func New(cfg Config) fiber.Handler {
 		claims, err := VerifyJwt(strings.Split(authorizationBearer, " ")[1], cfg.Permission)
 		if err == nil {
 			c.Locals("userID", claims.UserId)
-			fmt.Println(claims)
 			return c.Next()
 		}
 

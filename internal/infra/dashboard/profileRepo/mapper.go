@@ -6,13 +6,21 @@ import (
 )
 
 func profileToModel(profile []sqlc.GetProfileAndChatsRow) *models.Profile {
-	var chats []models.Chats
+	var chats []*models.Chats
 	for i := 0; i < len(profile); i++ {
-		chats = append(chats, models.Chats{
-			Id:    profile[i].ChatbotID.Int64,
-			Title: profile[i].Title.String,
-		})
+		if profile[i].ChatbotID.Valid {
+			chats = append(chats, &models.Chats{
+				Id:    profile[i].ChatbotID.Int64,
+				Title: profile[i].Title.String,
+			})
+		}
+
 	}
+
+	if chats == nil {
+		chats = []*models.Chats{}
+	}
+
 	return &models.Profile{
 		User: models.User{
 			Username:       profile[0].Username,
