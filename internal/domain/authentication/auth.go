@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/vyroai/VyroAI/commons/errors"
 	"github.com/vyroai/VyroAI/commons/otel"
-	"github.com/vyroai/VyroAI/internal/domain/authentication/repo"
+	repo2 "github.com/vyroai/VyroAI/internal/domain/repo"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -20,12 +20,12 @@ type Authentication interface {
 
 type AuthService struct {
 	tracer       trace.Tracer
-	userRepo     repo.AuthRepo
-	bcryptRepo   repo.BcryptRepo
+	userRepo     repo2.UserRepo
+	bcryptRepo   repo2.BcryptRepo
 	authProvider *authProviderRepository.AuthProvider
 }
 
-func NewAuthService(userRepo repo.AuthRepo, bcryptRepo repo.BcryptRepo, authProvider *authProviderRepository.AuthProvider) Authentication {
+func NewAuthService(userRepo repo2.UserRepo, bcryptRepo repo2.BcryptRepo, authProvider *authProviderRepository.AuthProvider) Authentication {
 	tracer := otel.InitTracing("authenticationService", "0.1.0")
 
 	return &AuthService{

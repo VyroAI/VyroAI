@@ -3,7 +3,7 @@ package bcryptRepository
 import (
 	"context"
 	"github.com/vyroai/VyroAI/commons/otel"
-	"github.com/vyroai/VyroAI/internal/domain/authentication/repo"
+	"github.com/vyroai/VyroAI/internal/domain/repo"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/crypto/bcrypt"
 )

@@ -8,6 +8,7 @@ import (
 	"github.com/vyroai/VyroAI/commons/logger"
 	"github.com/vyroai/VyroAI/internal/controller/httpd"
 	"github.com/vyroai/VyroAI/internal/domain/authentication"
+	"github.com/vyroai/VyroAI/internal/domain/dashboard"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/bcryptRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/userRepository"
@@ -29,7 +30,9 @@ func main() {
 		fx.Provide(userRepository.NewUserRepository),
 		fx.Provide(bcryptRepository.NewBcryptRepository),
 		fx.Provide(authProviderRepository.NewAuthProvider),
+
 		fx.Provide(authentication.NewAuthService),
+		fx.Provide(dashboard.NewDashboardService),
 
 		fx.Provide(httpd.NewWebServiceHttpServer),
 

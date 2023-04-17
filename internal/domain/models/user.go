@@ -16,6 +16,3 @@ type User struct {
 
 type Subscription struct {
 }
-
-type Chats struct {
-}

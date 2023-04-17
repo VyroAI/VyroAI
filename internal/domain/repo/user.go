@@ -5,7 +5,7 @@ import (
 	"github.com/vyroai/VyroAI/internal/domain/models"
 )
 
-type AuthRepo interface {
+type UserRepo interface {
 	GetUserByID(ctx context.Context, userID int64) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	GetUserByUsername(ctx context.Context, username string) (*models.User, error)

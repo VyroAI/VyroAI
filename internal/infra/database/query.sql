@@ -68,3 +68,18 @@ VALUES (?, ?);
 -- name: AddEmailToNewsletter :exec
 INSERT INTO newsletter_subscribed (email)
 VALUES (?);
+
+
+-- name: GetProfileAndChats :many
+SELECT  username,
+        email,
+        avatar_id,
+        permission,
+        email_confirmed,
+        is_banned,
+        users.created_at,
+        chat_bot.title,
+        chat_bot.chatbot_id
+FROM users LEFT JOIN
+     chat_bot ON chat_bot.user_id=users.id
+WHERE users.id=?;

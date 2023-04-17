@@ -71,6 +71,66 @@ func (q *Queries) CreateUserSubscription(ctx context.Context, arg CreateUserSubs
 	return err
 }
 
+const getProfileAndChats = `-- name: GetProfileAndChats :many
+SELECT  username,
+        email,
+        avatar_id,
+        permission,
+        email_confirmed,
+        is_banned,
+        users.created_at,
+        chat_bot.title,
+        chat_bot.chatbot_id
+FROM users LEFT JOIN
+     chat_bot ON chat_bot.user_id=users.id
+WHERE users.id=?
+`
+
+type GetProfileAndChatsRow struct {
+	Username       string
+	Email          string
+	AvatarID       string
+	Permission     int32
+	EmailConfirmed bool
+	IsBanned       bool
+	CreatedAt      time.Time
+	Title          sql.NullString
+	ChatbotID      sql.NullInt64
+}
+
+func (q *Queries) GetProfileAndChats(ctx context.Context, id int64) ([]GetProfileAndChatsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProfileAndChats, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProfileAndChatsRow
+	for rows.Next() {
+		var i GetProfileAndChatsRow
+		if err := rows.Scan(
+			&i.Username,
+			&i.Email,
+			&i.AvatarID,
+			&i.Permission,
+			&i.EmailConfirmed,
+			&i.IsBanned,
+			&i.CreatedAt,
+			&i.Title,
+			&i.ChatbotID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id,
        username,
