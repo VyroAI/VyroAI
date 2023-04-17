@@ -12,6 +12,7 @@ import (
 	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/bcryptRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/userRepository"
+	"github.com/vyroai/VyroAI/internal/infra/dashboard/profileRepo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -32,6 +33,8 @@ func main() {
 		fx.Provide(authProviderRepository.NewAuthProvider),
 
 		fx.Provide(authentication.NewAuthService),
+
+		fx.Provide(profileRepo.NewProfileRepository),
 		fx.Provide(dashboard.NewDashboardService),
 
 		fx.Provide(httpd.NewWebServiceHttpServer),

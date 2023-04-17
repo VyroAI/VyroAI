@@ -8,16 +8,19 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/vyroai/VyroAI/commons/otel"
 	"github.com/vyroai/VyroAI/internal/domain/authentication"
+	"github.com/vyroai/VyroAI/internal/domain/dashboard"
 	"log"
 )
 
 type WebServiceHttpServer struct {
-	authService authentication.Authentication
+	authService      authentication.Authentication
+	dashboardService dashboard.Dashboard
 }
 
-func NewWebServiceHttpServer(authService authentication.Authentication) *WebServiceHttpServer {
+func NewWebServiceHttpServer(authService authentication.Authentication, dashboardService dashboard.Dashboard) *WebServiceHttpServer {
 	return &WebServiceHttpServer{
-		authService: authService,
+		authService:      authService,
+		dashboardService: dashboardService,
 	}
 }
 

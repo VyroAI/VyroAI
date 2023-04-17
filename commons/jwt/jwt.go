@@ -21,7 +21,7 @@ var _prvKey []byte
 //go:embed secret/id_rsa.pub
 var _publicKey []byte
 
-func GenerateJwtToken(userID int64, permission int32) string {
+func GenerateJwt(userID int64, permission int32) string {
 	var err error
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(_prvKey)
@@ -48,7 +48,7 @@ func GenerateJwtToken(userID int64, permission int32) string {
 	return signedToken
 }
 
-func VerifyJetToken(token string) (*Claims, error) {
+func VerifyJwt(token string, permission Permission) (*Claims, error) {
 	var err error
 
 	if err != nil {
@@ -68,7 +68,12 @@ func VerifyJetToken(token string) (*Claims, error) {
 	}
 
 	if claims, ok := decodedToken.Claims.(*Claims); ok && decodedToken.Valid {
-		return claims, nil
+		if claims.Role == 0 {
+			return claims, nil
+		} else {
+			return nil, errors.New("invalid JWT")
+		}
+
 	} else {
 		return nil, errors.New("invalid JWT")
 	}

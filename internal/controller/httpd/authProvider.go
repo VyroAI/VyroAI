@@ -68,7 +68,7 @@ func (s *WebServiceHttpServer) callbackLogin(c *fiber.Ctx) error {
 	case "apple":
 
 	}
-	jwtToken := jwt.GenerateJwtToken(userID, permission)
+	jwtToken := jwt.GenerateJwt(userID, permission)
 
 	authCookie := &fiber.Cookie{
 		Name:    "authorization",
@@ -105,7 +105,7 @@ func (s *WebServiceHttpServer) callbackRegister(c *fiber.Ctx) error {
 		response.ErrorJson(c, 400, "provider not found")
 	}
 
-	jwtToken := jwt.GenerateJwtToken(userID, permission)
+	jwtToken := jwt.GenerateJwt(userID, permission)
 
 	authCookie := &fiber.Cookie{
 		Name:    "authorization",

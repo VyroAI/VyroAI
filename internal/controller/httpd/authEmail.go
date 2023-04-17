@@ -55,7 +55,7 @@ func (s *WebServiceHttpServer) login(c *fiber.Ctx) error {
 		}
 	}
 
-	response.SuccessJson(c, 200, "Successfully created login", jwt.GenerateJwtToken(userID, permission))
+	response.SuccessJson(c, 200, "Successfully created login", jwt.GenerateJwt(userID, permission))
 	return nil
 }
 
@@ -92,7 +92,7 @@ func (s *WebServiceHttpServer) register(c *fiber.Ctx) error {
 		}
 	}
 
-	response.SuccessJson(c, 201, "Successfully created an account", jwt.GenerateJwtToken(userID, permission))
+	response.SuccessJson(c, 201, "Successfully created an account", jwt.GenerateJwt(userID, permission))
 	return nil
 
 }
