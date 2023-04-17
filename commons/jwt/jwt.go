@@ -68,7 +68,8 @@ func VerifyJwt(token string, permission Permission) (*Claims, error) {
 	}
 
 	if claims, ok := decodedToken.Claims.(*Claims); ok && decodedToken.Valid {
-		if claims.Role == 0 {
+
+		if claims.Role >= int32(permission) {
 			return claims, nil
 		} else {
 			return nil, errors.New("invalid JWT")
