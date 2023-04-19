@@ -5,6 +5,13 @@ provider:
   google:
     login_redirect_url: https://api.vyroai.com/v1/auth/google/login/callback
     register_redirect_url: https://api.vyroai.com/v1/auth/google/register/callback
+  apple:
+    login_redirect_url: https://api.vyroai.com/v1/auth/apple/login/callback
+    register_redirect_url: https://api.vyroai.com/v1/auth/apple/register/callback
+  instagram:
+    login_redirect_url: https://api.vyroai.com/v1/auth/instagram/login/callback
+    register_redirect_url: https://api.vyroai.com/v1/auth/instagram/register/callback
+
 database:
   mysql:
     url: PLANETSCALE_DB

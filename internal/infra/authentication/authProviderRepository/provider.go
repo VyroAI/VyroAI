@@ -3,6 +3,7 @@ package authProviderRepository
 import (
 	"context"
 	"github.com/vyroai/VyroAI/commons/oauth"
+	"github.com/vyroai/VyroAI/internal/infra"
 	"os"
 )
 
@@ -11,13 +12,14 @@ type AuthProvider struct {
 	GoogleProvider  oauth.Provider
 }
 
-func NewAuthProvider() *AuthProvider {
+func NewAuthProvider(config *infra.Config) *AuthProvider {
+
 	discord, _ := oauth.NewProviderByName("discord",
 		&oauth.BaseProvider{
 			Ctx:                 context.Background(),
 			Scopes:              []string{"identify", "email"},
-			RedirectLoginUrl:    os.Getenv("BASE_URL") + "v1/auth/discord/login/callback",
-			RedirectRegisterUrl: os.Getenv("BASE_URL") + "v1/auth/discord/register/callback",
+			RedirectLoginUrl:    config.Provider.Discord.LoginRedirectURL,
+			RedirectRegisterUrl: config.Provider.Discord.RegisterRedirectURL,
 			ClientId:            os.Getenv("DISCORD_CLIENT_ID"),
 			ClientSecret:        os.Getenv("DISCORD_CLIENT_SECRET"),
 			AuthUrl:             "https://discord.com/api/oauth2/authorize",
@@ -32,8 +34,8 @@ func NewAuthProvider() *AuthProvider {
 				"https://www.googleapis.com/auth/userinfo.profile",
 				"https://www.googleapis.com/auth/userinfo.email",
 			},
-			RedirectLoginUrl:    os.Getenv("BASE_URL") + "v1/auth/google/login/callback",
-			RedirectRegisterUrl: os.Getenv("BASE_URL") + "v1/auth/google/register/callback",
+			RedirectLoginUrl:    config.Provider.Google.LoginRedirectURL,
+			RedirectRegisterUrl: config.Provider.Google.RegisterRedirectURL,
 			ClientId:            os.Getenv("GOOGLE_CLIENT_ID"),
 			ClientSecret:        os.Getenv("GOOGLE_CLIENT_SECRET"),
 			AuthUrl:             "https://accounts.google.com/o/oauth2/auth",

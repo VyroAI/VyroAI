@@ -60,7 +60,10 @@ func (s *WebServiceHttpServer) callbackLogin(c *fiber.Ctx) error {
 				Expires: time.Now().Add(10 * time.Second),
 			}
 			c.Cookie(authCookie)
-			c.Redirect(os.Getenv("WEBAPP_BASE_URL") + "login")
+			err := c.Redirect(os.Getenv("WEBAPP_BASE_URL") + "login")
+			if err != nil {
+				return err
+			}
 			return nil
 		}
 	case "google":
@@ -76,7 +79,10 @@ func (s *WebServiceHttpServer) callbackLogin(c *fiber.Ctx) error {
 		Expires: time.Now().Add(240 * time.Hour),
 	}
 	c.Cookie(authCookie)
-	c.Redirect(os.Getenv("WEBAPP_BASE_URL") + "dashboard")
+	err = c.Redirect(os.Getenv("WEBAPP_BASE_URL") + "dashboard")
+	if err != nil {
+		return err
+	}
 	return nil
 
 }
@@ -113,7 +119,10 @@ func (s *WebServiceHttpServer) callbackRegister(c *fiber.Ctx) error {
 		Expires: time.Now().Add(240 * time.Hour),
 	}
 	c.Cookie(authCookie)
-	c.Redirect(os.Getenv("WEBAPP_BASE_URL") + "dashboard")
+	err = c.Redirect(os.Getenv("WEBAPP_BASE_URL") + "dashboard")
+	if err != nil {
+		return err
+	}
 	return nil
 
 }
