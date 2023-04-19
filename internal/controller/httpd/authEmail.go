@@ -25,7 +25,7 @@ func (s *WebServiceHttpServer) login(c *fiber.Ctx) error {
 	var login LoginRequestPayload
 
 	if err := c.BodyParser(&login); err != nil {
-		response.ErrorJson(c, 401, err.Error())
+		response.ErrorJson(c, 400, err.Error())
 		return nil
 	}
 

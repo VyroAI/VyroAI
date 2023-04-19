@@ -71,15 +71,39 @@ VALUES (?);
 
 
 -- name: GetProfileAndChats :many
-SELECT  username,
-        email,
-        avatar_id,
-        permission,
-        email_confirmed,
-        is_banned,
-        users.created_at,
-        chat_bot.title,
-        chat_bot.chatbot_id
-FROM users LEFT JOIN
-     chat_bot ON chat_bot.user_id=users.id
-WHERE users.id=?;
+SELECT username,
+       email,
+       avatar_id,
+       permission,
+       email_confirmed,
+       is_banned,
+       users.created_at,
+       chat_bot.title,
+       chat_bot.id
+FROM users
+         LEFT JOIN
+     chat_bot ON chat_bot.user_id = users.id
+WHERE users.id = ?;
+
+
+-- name: GetChatByChatID :one
+SELECT *
+from chat_bot
+WHERE id = ?
+  AND user_id = ?;
+
+-- name: GetChatMessageByChatID :many
+SELECT chat_message.id,
+       chat_message.content,
+       chat_message.bot,
+       chat_message.created_by,
+       chat_message.created_at,
+       chat_bot.id as chatbot_id
+from chat_message
+         LEFT JOIN chat_bot on chat_bot.id = chat_message.chatbot_id
+WHERE chatbot_id = ? && chat_bot.user_id = ?
+LIMIT ? OFFSET ?;
+
+-- name: CreateMessage :execlastid
+INSERT INTO chat_message (content, created_by, chatbot_id)
+VALUES (?, ?, ?);

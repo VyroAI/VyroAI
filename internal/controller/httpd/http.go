@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/vyroai/VyroAI/commons/otel"
 	"github.com/vyroai/VyroAI/internal/domain/authentication"
+	"github.com/vyroai/VyroAI/internal/domain/chat"
 	"github.com/vyroai/VyroAI/internal/domain/dashboard"
 	"log"
 )
@@ -15,12 +16,14 @@ import (
 type WebServiceHttpServer struct {
 	authService      authentication.Authentication
 	dashboardService dashboard.Dashboard
+	chatService      chat.Chat
 }
 
-func NewWebServiceHttpServer(authService authentication.Authentication, dashboardService dashboard.Dashboard) *WebServiceHttpServer {
+func NewWebServiceHttpServer(authService authentication.Authentication, dashboardService dashboard.Dashboard, chatService chat.Chat) *WebServiceHttpServer {
 	return &WebServiceHttpServer{
 		authService:      authService,
 		dashboardService: dashboardService,
+		chatService:      chatService,
 	}
 }
 
@@ -44,6 +47,8 @@ func (s *WebServiceHttpServer) Router() *fiber.App {
 	s.MountAuth(app)
 
 	s.MountDashboard(app)
+
+	s.MountChat(app)
 
 	app.Get("/health", func(ctx *fiber.Ctx) error {
 		err := ctx.SendString("ok")

@@ -8,10 +8,12 @@ import (
 	"github.com/vyroai/VyroAI/commons/logger"
 	"github.com/vyroai/VyroAI/internal/controller/httpd"
 	"github.com/vyroai/VyroAI/internal/domain/authentication"
+	"github.com/vyroai/VyroAI/internal/domain/chat"
 	"github.com/vyroai/VyroAI/internal/domain/dashboard"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/bcryptRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/userRepository"
+	"github.com/vyroai/VyroAI/internal/infra/dashboard/chatRepo"
 	"github.com/vyroai/VyroAI/internal/infra/dashboard/profileRepo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -28,14 +30,19 @@ func main() {
 
 		fx.Provide(sql.NewSqlConn),
 
+		//repositories
 		fx.Provide(userRepository.NewUserRepository),
 		fx.Provide(bcryptRepository.NewBcryptRepository),
 		fx.Provide(authProviderRepository.NewAuthProvider),
 
-		fx.Provide(authentication.NewAuthService),
-
 		fx.Provide(profileRepo.NewProfileRepository),
+
+		fx.Provide(chatRepo.NewChatRepository),
+
+		//services
+		fx.Provide(authentication.NewAuthService),
 		fx.Provide(dashboard.NewDashboardService),
+		fx.Provide(chat.NewChatService),
 
 		fx.Provide(httpd.NewWebServiceHttpServer),
 

@@ -21,6 +21,25 @@ func (q *Queries) AddEmailToNewsletter(ctx context.Context, email string) error 
 	return err
 }
 
+const createMessage = `-- name: CreateMessage :execlastid
+INSERT INTO chat_message (content, created_by, chatbot_id)
+VALUES (?, ?, ?)
+`
+
+type CreateMessageParams struct {
+	Content   string
+	CreatedBy int64
+	ChatbotID int64
+}
+
+func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createMessage, arg.Content, arg.CreatedBy, arg.ChatbotID)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const createOAuthAccount = `-- name: CreateOAuthAccount :exec
 INSERT oauth_account (user_id, oauth_provider, account_id)
 VALUES (?, ?, ?)
@@ -71,19 +90,111 @@ func (q *Queries) CreateUserSubscription(ctx context.Context, arg CreateUserSubs
 	return err
 }
 
+const getChatByChatID = `-- name: GetChatByChatID :one
+SELECT id, user_id, title, character_count, private, created_at, updated_at
+from chat_bot
+WHERE id = ?
+  AND user_id = ?
+`
+
+type GetChatByChatIDParams struct {
+	ID     int64
+	UserID int64
+}
+
+func (q *Queries) GetChatByChatID(ctx context.Context, arg GetChatByChatIDParams) (ChatBot, error) {
+	row := q.db.QueryRowContext(ctx, getChatByChatID, arg.ID, arg.UserID)
+	var i ChatBot
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.CharacterCount,
+		&i.Private,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getChatMessageByChatID = `-- name: GetChatMessageByChatID :many
+SELECT chat_message.id,
+       chat_message.content,
+       chat_message.bot,
+       chat_message.created_by,
+       chat_message.created_at,
+       chat_bot.id as chatbot_id
+from chat_message
+         LEFT JOIN chat_bot on chat_bot.id = chat_message.chatbot_id
+WHERE chatbot_id = ? && chat_bot.user_id = ?
+LIMIT ? OFFSET ?
+`
+
+type GetChatMessageByChatIDParams struct {
+	ChatbotID int64
+	UserID    int64
+	Limit     int32
+	Offset    int32
+}
+
+type GetChatMessageByChatIDRow struct {
+	ID        int64
+	Content   string
+	Bot       bool
+	CreatedBy int64
+	CreatedAt sql.NullTime
+	ChatbotID sql.NullInt64
+}
+
+func (q *Queries) GetChatMessageByChatID(ctx context.Context, arg GetChatMessageByChatIDParams) ([]GetChatMessageByChatIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getChatMessageByChatID,
+		arg.ChatbotID,
+		arg.UserID,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetChatMessageByChatIDRow
+	for rows.Next() {
+		var i GetChatMessageByChatIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Content,
+			&i.Bot,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.ChatbotID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProfileAndChats = `-- name: GetProfileAndChats :many
-SELECT  username,
-        email,
-        avatar_id,
-        permission,
-        email_confirmed,
-        is_banned,
-        users.created_at,
-        chat_bot.title,
-        chat_bot.chatbot_id
-FROM users LEFT JOIN
-     chat_bot ON chat_bot.user_id=users.id
-WHERE users.id=?
+SELECT username,
+       email,
+       avatar_id,
+       permission,
+       email_confirmed,
+       is_banned,
+       users.created_at,
+       chat_bot.title,
+       chat_bot.id
+FROM users
+         LEFT JOIN
+     chat_bot ON chat_bot.user_id = users.id
+WHERE users.id = ?
 `
 
 type GetProfileAndChatsRow struct {
@@ -95,7 +206,7 @@ type GetProfileAndChatsRow struct {
 	IsBanned       bool
 	CreatedAt      time.Time
 	Title          sql.NullString
-	ChatbotID      sql.NullInt64
+	ID             sql.NullInt64
 }
 
 func (q *Queries) GetProfileAndChats(ctx context.Context, id int64) ([]GetProfileAndChatsRow, error) {
@@ -116,7 +227,7 @@ func (q *Queries) GetProfileAndChats(ctx context.Context, id int64) ([]GetProfil
 			&i.IsBanned,
 			&i.CreatedAt,
 			&i.Title,
-			&i.ChatbotID,
+			&i.ID,
 		); err != nil {
 			return nil, err
 		}

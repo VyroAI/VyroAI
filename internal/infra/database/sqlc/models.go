@@ -57,13 +57,21 @@ func (ns NullOauthAccountOauthProvider) Value() (driver.Value, error) {
 
 type ChatBot struct {
 	ID             int64
-	ChatbotID      int64
 	UserID         int64
 	Title          string
 	CharacterCount int32
 	Private        bool
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
+}
+
+type ChatMessage struct {
+	ID        int64
+	ChatbotID int64
+	Content   string
+	Bot       bool
+	CreatedBy int64
+	CreatedAt sql.NullTime
 }
 
 type NewsletterSubscribed struct {

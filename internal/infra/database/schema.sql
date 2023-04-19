@@ -57,7 +57,6 @@ CREATE TABLE subscription_plans
 CREATE TABLE chat_bot
 (
     id              bigint(19) UNSIGNED NOT NULL AUTO_INCREMENT,
-    chatbot_id      bigint(19) UNSIGNED NOT NULL,
     user_id         bigint(19) UNSIGNED NOT NULL,
     title           varchar(100)        NOT NULL,
     character_count INT UNSIGNED        NOT NULL,
@@ -65,8 +64,21 @@ CREATE TABLE chat_bot
     created_at      TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE chat_message
+(
+    id         bigint(19) UNSIGNED NOT NULL AUTO_INCREMENT,
+    chatbot_id bigint(19) UNSIGNED NOT NULL,
+    content    TEXT                NOT NULL,
+    bot        TINYINT(1)          NOT NULL DEFAULT 0,
+    created_by bigint(19) UNSIGNED NOT NULL,
+    created_at TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP,
+
     PRIMARY KEY (id, chatbot_id)
 );
+
 
 
 CREATE TABLE payments
