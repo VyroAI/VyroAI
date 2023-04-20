@@ -4,14 +4,12 @@ import (
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	"github.com/vyroai/VyroAI/commons/config"
 	"github.com/vyroai/VyroAI/commons/database/sql"
 	"github.com/vyroai/VyroAI/commons/logger"
 	"github.com/vyroai/VyroAI/internal/controller/httpd"
 	"github.com/vyroai/VyroAI/internal/domain/authentication"
 	"github.com/vyroai/VyroAI/internal/domain/chat"
 	"github.com/vyroai/VyroAI/internal/domain/dashboard"
-	"github.com/vyroai/VyroAI/internal/infra"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/authProviderRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/bcryptRepository"
 	"github.com/vyroai/VyroAI/internal/infra/authentication/userRepository"
@@ -28,7 +26,7 @@ func init() {
 func main() {
 
 	fx.New(
-		fx.Provide(config.ReadConfig[infra.Config]),
+		//fx.Provide(config.ReadConfig[infra.Config]),
 		fx.Provide(logger.InitLogger),
 
 		fx.Provide(sql.NewSqlConn),
