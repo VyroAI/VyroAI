@@ -20,6 +20,6 @@ WORKDIR /app
 COPY --from=Builder /app/main ./
 COPY --from=Builder /app/config.prod.yml ./
 
-RUN chmod +x ./main w
+RUN chmod +x ./main
 
 CMD [ "./main" ]
