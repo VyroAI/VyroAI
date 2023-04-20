@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY ./go.mod .
 COPY ./go.sum .
-COPY ./config.prod.yml ./app
+COPY ./config.prod.yml .
 
 COPY . /app
 
