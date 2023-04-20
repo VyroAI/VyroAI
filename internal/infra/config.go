@@ -1,26 +1,26 @@
 package infra
 
 type Config struct {
-	Provider provider `json:"provider"`
-	Database database `json:"database"`
+	Provider Provider `yaml:"provider"`
+	Database Database `yaml:"database"`
 }
 
-type database struct {
-	Mysql mysql `json:"mysql"`
+type Provider struct {
+	Discord   OAuthProvider `yaml:"discord"`
+	Google    OAuthProvider `yaml:"google"`
+	Apple     OAuthProvider `yaml:"apple"`
+	Instagram OAuthProvider `yaml:"instagram"`
 }
 
-type mysql struct {
-	URL string `json:"url"`
+type OAuthProvider struct {
+	LoginRedirectURL    string `yaml:"loginRedirectUrl"`
+	RegisterRedirectURL string `yaml:"registerRedirectUrl"`
 }
 
-type provider struct {
-	Discord   url `json:"discord"`
-	Google    url `json:"google"`
-	Apple     url `json:"apple"`
-	Instagram url `json:"instagram"`
+type Database struct {
+	MySQL MySQLConfig `yaml:"mysql"`
 }
 
-type url struct {
-	LoginRedirectURL    string `json:"login_redirect_url"`
-	RegisterRedirectURL string `json:"register_redirect_url"`
+type MySQLConfig struct {
+	URL string `yaml:"url"`
 }

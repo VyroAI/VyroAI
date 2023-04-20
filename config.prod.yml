@@ -1,16 +1,16 @@
 provider:
   discord:
-    login_redirect_url: https://api.vyroai.com/v1/auth/discord/login/callback
-    register_redirect_url: https://api.vyroai.com/v1/auth/discord/register/callback
+    loginRedirectUrl: https://api.vyroai.com/v1/auth/discord/login/callback
+    registerRedirectUrl: https://api.vyroai.com/v1/auth/discord/register/callback
   google:
-    login_redirect_url: https://api.vyroai.com/v1/auth/google/login/callback
-    register_redirect_url: https://api.vyroai.com/v1/auth/google/register/callback
+    loginRedirectUrl: https://api.vyroai.com/v1/auth/google/login/callback
+    registerRedirectUrl: https://api.vyroai.com/v1/auth/google/register/callback
   apple:
-    login_redirect_url: https://api.vyroai.com/v1/auth/apple/login/callback
-    register_redirect_url: https://api.vyroai.com/v1/auth/apple/register/callback
+    loginRedirectUrl: https://api.vyroai.com/v1/auth/apple/login/callback
+    registerRedirectUrl: https://api.vyroai.com/v1/auth/apple/register/callback
   instagram:
-    login_redirect_url: https://api.vyroai.com/v1/auth/instagram/login/callback
-    register_redirect_url: https://api.vyroai.com/v1/auth/instagram/register/callback
+    loginRedirectUrl: https://api.vyroai.com/v1/auth/instagram/login/callback
+    registerRedirectUrl: https://api.vyroai.com/v1/auth/instagram/register/callback
 
 database:
   mysql:

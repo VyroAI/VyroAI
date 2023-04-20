@@ -23,6 +23,7 @@ func (as *AuthService) GenerateDiscordAuthUrl(ctx context.Context, action string
 		url = as.authProvider.DiscordProvider.BuildRegisterUrl("hello")
 
 	}
+	fmt.Println(url)
 	return url, nil
 }
 
