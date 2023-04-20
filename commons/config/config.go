@@ -6,7 +6,7 @@ import (
 )
 
 func ReadConfig[T any]() (*T, error) {
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("./")
 
 	if os.Getenv("LIGHTSTEP_ENV") == "prod" || os.Getenv("ENV") == "prod" {
 		viper.SetConfigName("config.prod")
