@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY ./go.mod .
 COPY ./go.sum .
-COPY ./config.prod.yml .
+COPY ./config.prod.yml ./app
 
 COPY . /app
 
@@ -18,7 +18,8 @@ FROM alpine:latest as Server
 WORKDIR /app
 
 COPY --from=Builder /app/main ./
+COPY --from=Builder /app/config.prod.yml ./
 
-RUN chmod +x ./main
+RUN chmod +x ./main w
 
 CMD [ "./main" ]
