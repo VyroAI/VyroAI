@@ -1,7 +1,6 @@
 # Build stage
 FROM golang:latest AS Builder
 
-ARG github_token
 
 WORKDIR /app
 
